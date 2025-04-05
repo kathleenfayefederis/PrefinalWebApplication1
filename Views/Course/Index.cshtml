@@ -6,16 +6,51 @@
 
 <h1>Courses</h1>
 
+<div class="container my-3">
+    <div class="row justify-content-center">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4 class="my-2">Add New Course</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/Users/SaveUser" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label>Course Name:</label>
+                            <input class="form-control" type="text" name="CourseName" required />
+                        </div>
+                        <div class="mb-3">
+                            <label>Course Duration:</label>
+                            <input class="form-control" type="number" name="CourseDuration" required />
+                        </div>
+                        <div class="mb-3">
+                            <label>Course Department:</label>
+                            <input class="form-control" type="text" name="CourseDepartment" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary my-3 w-100">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <table class="table">
     <thead class="thead-dark">
         <tr>
             <th scope="col">Course ID</th>
             <th scope="col">Course Name</th>
+            <th scope="col">Course Duration</th>
+            <th scope="col">Course Department</th>
+            <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <th scope="row">1</th>
+            <td>Otto</td>
+            <td>Mark</td>
+            <td>Otto</td>
             <td>Mark</td>
         </tr>
     </tbody>

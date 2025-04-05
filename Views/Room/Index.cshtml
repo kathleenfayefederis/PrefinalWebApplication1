@@ -6,6 +6,35 @@
 
 <h1>Rooms</h1>
 
+<div class="container my-3">
+    <div class="row justify-content-center">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4 class="my-2">Add New Room</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/Users/SaveUser" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label>Room Name:</label>
+                            <input class="form-control" type="text" name="RoomName" required />
+                        </div>
+                        <div class="mb-3">
+                            <label>Floor:</label>
+                            <input class="form-control" type="number" name="Floor" required />
+                        </div>
+                        <div class="mb-3">
+                            <label>Building:</label>
+                            <input class="form-control" type="text" name="Building" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary my-3 w-100">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <table class="table">
     <thead class="thead-dark">
         <tr>
@@ -13,6 +42,7 @@
             <th scope="col">Room Name</th>
             <th scope="col">Floor</th>
             <th scope="col">Building</th>
+            <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -21,11 +51,13 @@
             <td>Mark</td>
             <td>Otto</td>
             <td>Otto</td>
+            <td>Mark</td>
         </tr>
         <tr>
             <th scope="row">2</th>
             <td>Otto</td>
             <td>Mark</td>
+            <td>Otto</td>
             <td>Otto</td>
         </tr>
     </tbody>
