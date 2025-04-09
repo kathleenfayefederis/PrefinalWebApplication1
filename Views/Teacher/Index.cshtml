@@ -4,17 +4,26 @@
 @{
 }
 
-<h1>Teachers</h1>
+<style>
+    #teacherFormContainer {
+        display: none;
+    }
+</style>
 
-<div class="container my-3">
+<div class="d-flex justify-content-between text-center">
+    <h1>Teachers</h1>
+    <button class="btn btn-primary" onClick="toggleForm()"><i class="fa fa-user-plus"></i></button>
+</div>
+
+<div id="teacherFormContainer" class="container my-3">
     <div class="row justify-content-center">
         <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="card">
+            <div class="rounded-3 card">
                 <div class="card-header text-center">
                     <h4 class="my-2">Add New Teacher</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/Users/SaveUser" enctype="multipart/form-data">
+                    <form method="post" action="/Users/SaveTeacher" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label>First Name:</label>
                             <input class="form-control" type="text" name="FirstName" required />
@@ -39,7 +48,7 @@
                             <label>Contact Number:</label>
                             <input class="form-control" type="text" name="ContactNumber" required />
                         </div>
-                        <button type="submit" class="btn btn-primary my-3 w-100">Save</button>
+                        <button type="submit" class="btn btn-success my-3 w-100">Save</button>
                     </form>
                 </div>
             </div>
@@ -88,3 +97,12 @@
         </table>
     </div>
 </div>
+
+
+<script>
+    function toggleForm() {
+        var formContainer = document.querySelector('#teacherFormContainer');
+        const currentDisplay = window.getComputedStyle(formContainer).display;
+        formContainer.style.display = currentDisplay === 'none' ? 'block' : 'none';
+    }
+</script>

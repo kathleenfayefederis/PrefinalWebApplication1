@@ -1,17 +1,27 @@
 ﻿@{
 }
 
-<h1>Sections</h1>
 
-<div class="container my-3">
+<style>
+    #sectionFormContainer {
+        display: none;
+    }
+</style>
+
+<div class="d-flex justify-content-between text-center">
+    <h1>Sections</h1>
+    <button class="btn btn-primary" onClick="toggleForm()"><i class="fa fa-user-plus"></i></button>
+</div>
+
+<div id="sectionFormContainer" class="container my-3">
     <div class="row justify-content-center">
         <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="card">
+            <div class="rounded-3 card">
                 <div class="card-header text-center">
                     <h4 class="my-2">Add New Section</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/Users/SaveUser" enctype="multipart/form-data">
+                    <form method="post" action="/Users/SaveSection" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label>Section Name:</label>
                             <input class="form-control" type="text" name="SectionName" required />
@@ -24,7 +34,7 @@
                             <label>Year Level:</label>
                             <input class="form-control" type="number" name="YearLevel" required />
                         </div>
-                        <button type="submit" class="btn btn-primary my-3 w-100">Save</button>
+                        <button type="submit" class="btn btn-success my-3 w-100">Save</button>
                     </form>
                 </div>
             </div>
@@ -33,7 +43,7 @@
 </div>
 
 
-<table class="table">
+<table class="table table-info">
     <thead class="thead-dark">
         <tr>
             <th scope="col">Section ID</th>
@@ -60,3 +70,12 @@
         </tr>
     </tbody>
 </table> 
+
+
+<script>
+    function toggleForm() {
+        var formContainer = document.querySelector('#sectionFormContainer');
+        const currentDisplay = window.getComputedStyle(formContainer).display;
+        formContainer.style.display = currentDisplay === 'none' ? 'block' : 'none';
+    }
+</script>

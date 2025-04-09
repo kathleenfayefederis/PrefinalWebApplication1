@@ -5,20 +5,26 @@
 }
 
 <style>
-
+    #studentFormContainer {
+        display: none;
+    }
 </style>
 
-<h1>Students</h1>
+<div class="d-flex justify-content-between text-center">
+    <h1>Students</h1>
+    <button class="btn btn-primary" onClick="toggleForm()"><i class="fa fa-user-plus"></i></button>
+</div>
 
-<div class="container my-3">
+<div id="studentFormContainer" class="container my-3">
     <div class="row justify-content-center">
         <div class="col-sm-12 col-md-12 col-lg-12">
-            <div class="card">
+            <div class="rounded-3 card">
                 <div class="card-header text-center">
                     <h4 class="my-2">Add New Student</h4>
                 </div>
+
                 <div class="card-body">
-                    <form method="post" action="/Users/SaveUser" enctype="multipart/form-data">
+                    <form method="post" action="/Student/SaveStudentInfo" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label>First Name:</label>
                             <input class="form-control" type="text" name="FirstName" required />
@@ -41,13 +47,13 @@
                         </div>
                         <div class="mb-3">
                             <label>Email Address:</label>
-                            <input class="form-control" type="email" name="Email" required />
+                            <input class="form-control" type="email" name="EmailAddress" required />
                         </div>
                         <div class="mb-3">
                             <label>Contact Number:</label>
                             <input class="form-control" type="text" name="ContactNumber" required />
                         </div>
-                        <button type="submit" class="btn btn-primary my-3 w-100">Save</button>
+                        <button type="submit" class="btn btn-success my-3 w-100">Save</button>
                     </form>
                 </div>
             </div>
@@ -57,7 +63,7 @@
 
 <div class="container my-3">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-info">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Student ID</th>
@@ -72,29 +78,37 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Mark</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                    <td>Mark</td>
-                </tr>
+                @foreach (var student in Model.StudentsList)
+                {
+                    <tr>
+                        <td scope="row">@student.StudentID</td>
+                        <td>@student.FirstName</td>
+                        <td>@student.MiddleName</td>
+                        <td>@student.LastName</td>
+                        <td>@student.Course</td>
+                        <td>@student.Section</td>
+                        <td>@student.EmailAddress</td>
+                        <td>@student.ContactNumber</td>
+                        <td>
+                            <input type="hidden" name="studentId" value="@student.StudentID" />
+                            <a class="btn btn-outline-warning" href="/Student/EditStudentInfo?studentId=@student.StudentID">
+                                <i class="fa fa-pen"></i>
+                            </a>
+                            <a class="btn btn-outline-danger" href="/Student/DeleteStudentInfo?studentID=@student.StudentID">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    function toggleForm() {
+        var formContainer = document.querySelector('#studentFormContainer');
+        const currentDisplay = window.getComputedStyle(formContainer).display;
+        formContainer.style.display = currentDisplay === 'none' ? 'block' : 'none';
+    }
+</script>

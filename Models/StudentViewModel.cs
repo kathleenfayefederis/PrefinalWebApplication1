@@ -10,5 +10,7 @@
         public string? Section { get; set; }
         public string? EmailAddress { get; set; }
         public string? ContactNumber { get; set; }
+
+        public List<StudentViewModel> StudentsList { get; set; } = new List<StudentViewModel>();
     }
 }
