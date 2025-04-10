@@ -7,5 +7,6 @@ namespace PrefinalWebApplication1.Models
         public string? SectionName { get; set; }
         public string? Course { get; set; }
         public string? YearLevel { get; set; }
+        public List<SectionViewModel> SectionsList { get; set; } = new List<SectionViewModel>();
     }
 }

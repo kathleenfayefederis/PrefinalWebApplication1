@@ -1,83 +1,148 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PrefinalWebApplication1.Models;
 
 namespace PrefinalWebApplication1.Controllers
 {
     public class TeacherController : Controller
     {
-        // GET: TeacherController
-        public ActionResult Index()
+        private static List<TeacherViewModel> teachersList = new List<TeacherViewModel>();
+        private const string teacherInfoFolderPath = "PrototypeDB/TeacherInfoFolder";
+
+        public TeacherController()
         {
-            return View();
+            if (!Directory.Exists(teacherInfoFolderPath))
+            {
+                Directory.CreateDirectory(teacherInfoFolderPath);
+            }
+
+            LoadTeacherInfo();
         }
 
-        // GET: TeacherController/Details/5
-        public ActionResult Details(int id)
+        public IActionResult Index()
         {
-            return View();
+            var model = new TeacherViewModel
+            {
+                TeachersList = teachersList.OrderBy(teach => teach.TeacherID).ToList()
+            };
+
+            return View(model);
         }
 
-        // GET: TeacherController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: TeacherController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult SaveTeacherInfo(TeacherViewModel newTeacher)
         {
-            try
+            if (newTeacher == null)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
-            catch
+
+            var existingTeacher = teachersList.FirstOrDefault(teach => teach.TeacherID == newTeacher.TeacherID);
+
+            if (existingTeacher != null)
             {
-                return View();
+                existingTeacher.FirstName = newTeacher.FirstName;
+                existingTeacher.MiddleName = newTeacher.MiddleName;
+                existingTeacher.LastName = newTeacher.LastName;
+                existingTeacher.Department = newTeacher.Department;
+                existingTeacher.EmailAddress = newTeacher.EmailAddress;
+                existingTeacher.ContactNumber = newTeacher.ContactNumber;
             }
+            else
+            {
+                newTeacher.TeacherID = teachersList.Count + 1;newTeacher.TeacherID = teachersList.Any() ? teachersList.Max(t => t.TeacherID) + 1 : 1;
+                teachersList.Add(newTeacher);
+            }
+
+            string filePath = Path.Combine(teacherInfoFolderPath, $"{newTeacher.TeacherID}.txt");
+            string teacherData = $"{newTeacher.TeacherID},{newTeacher.FirstName},{newTeacher.MiddleName},{newTeacher.LastName},{newTeacher.Department},{newTeacher.EmailAddress},{newTeacher.ContactNumber}";
+            System.IO.File.WriteAllText(filePath, teacherData);
+
+            return RedirectToAction("Index");
         }
 
-        // GET: TeacherController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public IActionResult DeleteTeacherInfo(int teacherID)
         {
-            return View();
+            var teacher = teachersList.FirstOrDefault(teach => teach.TeacherID == teacherID);
+            if (teacher != null)
+            {
+                teachersList.Remove(teacher);
+                string filePath = Path.Combine(teacherInfoFolderPath, $"{teacherID}.txt");
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            return RedirectToAction("Index");
         }
 
-        // POST: TeacherController/Edit/5
+        [HttpGet]
+        public IActionResult EditTeacherInfo(int teacherID)
+        {
+            LoadTeacherInfo();
+
+            string filePath = Path.Combine(teacherInfoFolderPath, $"{teacherID}.txt");
+
+            if (System.IO.File.Exists(filePath))
+            {
+                string[] teacherData = System.IO.File.ReadAllText(filePath).Split(',');
+
+                if (teacherData.Length >= 7)
+                {
+                    var teacher = new TeacherViewModel
+                    {
+                        TeacherID = int.Parse(teacherData[0]),
+                        FirstName = teacherData[1],
+                        MiddleName = teacherData[2],
+                        LastName = teacherData[3],
+                        Department = teacherData[4],
+                        EmailAddress = teacherData[5],
+                        ContactNumber = teacherData[6],
+                    };
+
+                    return View("EditTeacher", teacher);
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult UpdateTeacherInfo(TeacherViewModel updatedTeacher)
         {
-            try
+            string filePath = Path.Combine(teacherInfoFolderPath, $"{updatedTeacher.TeacherID}.txt");
+
+            if (System.IO.File.Exists(filePath))
             {
-                return RedirectToAction(nameof(Index));
+                string teacherData = $"{updatedTeacher.TeacherID},{updatedTeacher.FirstName},{updatedTeacher.MiddleName},{updatedTeacher.LastName},{updatedTeacher.Department},{updatedTeacher.EmailAddress},{updatedTeacher.ContactNumber}";
+                System.IO.File.WriteAllText(filePath, teacherData);
             }
-            catch
-            {
-                return View();
-            }
+
+            return RedirectToAction("Index");
         }
 
-        // GET: TeacherController/Delete/5
-        public ActionResult Delete(int id)
+        private void LoadTeacherInfo()
         {
-            return View();
-        }
-
-        // POST: TeacherController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            teachersList.Clear();
+            foreach (var file in Directory.GetFiles(teacherInfoFolderPath, "*.txt"))
             {
-                return RedirectToAction(nameof(Index));
+                string[] teacherData = System.IO.File.ReadAllText(file).Split(',');
+                if (teacherData.Length >= 7)
+                {
+                    teachersList.Add(new TeacherViewModel
+                    {
+                       TeacherID = int.Parse(teacherData[0]),
+                        FirstName = teacherData[1],
+                        MiddleName = teacherData[2],
+                        LastName = teacherData[3],
+                        Department = teacherData[4],
+                        EmailAddress = teacherData[5],
+                        ContactNumber = teacherData[6],
+                    });
+                }
             }
-            catch
-            {
-                return View();
-            }
+            teachersList = teachersList.OrderBy(teach => teach.TeacherID).ToList();
         }
     }
 }

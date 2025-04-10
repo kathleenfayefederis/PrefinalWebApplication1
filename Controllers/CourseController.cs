@@ -1,83 +1,141 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PrefinalWebApplication1.Models;
 
 namespace PrefinalWebApplication1.Controllers
 {
     public class CourseController : Controller
     {
-        // GET: CourseController
-        public ActionResult Index()
+        private static List<CourseViewModel> coursesList = new List<CourseViewModel>();
+        private const string courseInfoFolderPath = "PrototypeDB/CourseInfoFolder";
+
+        public CourseController()
         {
-            return View();
+            if (!Directory.Exists(courseInfoFolderPath))
+            {
+                Directory.CreateDirectory(courseInfoFolderPath);
+            }
+
+            LoadCourseInfo();
         }
 
-        // GET: CourseController/Details/5
-        public ActionResult Details(int id)
+        public IActionResult Index()
         {
-            return View();
+            var model = new CourseViewModel
+            {
+                CoursesList = coursesList.OrderBy(crs => crs.CourseID).ToList()
+            };
+
+            return View(model);
         }
 
-        // GET: CourseController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: CourseController/Create
+        //save user
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult SaveCourseInfo(CourseViewModel updatedCourse)
         {
-            try
+            if (updatedCourse == null)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
-            catch
+
+            var existingCourse = coursesList.FirstOrDefault(rm => rm.CourseID == updatedCourse.CourseID);
+
+            if (existingCourse != null)
             {
-                return View();
+                existingCourse.CourseID = updatedCourse.CourseID;
+                existingCourse.CourseName = updatedCourse.CourseName;
+                existingCourse.CourseDuration = updatedCourse.CourseDuration;
+                existingCourse.CourseDepartment = updatedCourse.CourseDepartment;
             }
+            else
+            {
+                updatedCourse.CourseID = coursesList.Count + 1;
+                coursesList.Add(updatedCourse);
+            }
+
+            string filePath = Path.Combine(courseInfoFolderPath, $"{updatedCourse.CourseID}.txt");
+            string courseData = $"{updatedCourse.CourseID},{updatedCourse.CourseName},{updatedCourse.CourseDuration},{updatedCourse.CourseDepartment}";
+            System.IO.File.WriteAllText(filePath, courseData);
+
+            return RedirectToAction("Index");
         }
 
-        // GET: CourseController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public IActionResult DeleteCourseInfo(int courseID)
         {
-            return View();
+            var user = coursesList.FirstOrDefault(usr => usr.CourseID == courseID);
+            if (user != null)
+            {
+                coursesList.Remove(user);
+                string filePath = Path.Combine(courseInfoFolderPath, $"{courseID}.txt");
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            return RedirectToAction("Index");
         }
 
-        // POST: CourseController/Edit/5
+        [HttpGet]
+        public IActionResult EditCourseInfo(int courseID)
+        {
+            LoadCourseInfo();
+
+            string filePath = Path.Combine(courseInfoFolderPath, $"{courseID}.txt");
+
+            if (System.IO.File.Exists(filePath))
+            {
+                string[] courseData = System.IO.File.ReadAllText(filePath).Split(',');
+
+                if (courseData.Length >= 4)
+                {
+                    var course = new CourseViewModel
+                    {
+                        CourseID = int.Parse(courseData[0]),
+                        CourseName = courseData[1],
+                        CourseDuration = int.Parse(courseData[2]),
+                        CourseDepartment = courseData[3],
+                    };
+
+                    return View("EditCourse", course);
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult UpdateCourseInfo(CourseViewModel updatedCourse)
         {
-            try
+            string filePath = Path.Combine(courseInfoFolderPath, $"{updatedCourse.CourseID}.txt");
+
+            if (System.IO.File.Exists(filePath))
             {
-                return RedirectToAction(nameof(Index));
+                string courseData = $"{updatedCourse.CourseID},{updatedCourse.CourseName},{updatedCourse.CourseDuration},{updatedCourse.CourseDepartment}";
+                System.IO.File.WriteAllText(filePath, courseData);
             }
-            catch
-            {
-                return View();
-            }
+
+            return RedirectToAction("Index");
         }
 
-        // GET: CourseController/Delete/5
-        public ActionResult Delete(int id)
+        private void LoadCourseInfo()
         {
-            return View();
-        }
-
-        // POST: CourseController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            coursesList.Clear();
+            foreach (var file in Directory.GetFiles(courseInfoFolderPath, "*.txt"))
             {
-                return RedirectToAction(nameof(Index));
+                string[] courseData = System.IO.File.ReadAllText(file).Split(',');
+                if (courseData.Length >= 4)
+                {
+                    coursesList.Add(new CourseViewModel
+                    {
+                        CourseID = int.Parse(courseData[0]),
+                        CourseName = courseData[1],
+                        CourseDuration = int.Parse(courseData[2]),
+                        CourseDepartment = courseData[3],
+                    });
+                }
             }
-            catch
-            {
-                return View();
-            }
+            coursesList = coursesList.OrderBy(sec => sec.CourseID).ToList();
         }
     }
 }

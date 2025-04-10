@@ -1,10 +1,12 @@
-﻿@{
-}
-
-
-<style>
+﻿<style>
     #sectionFormContainer {
         display: none;
+    }
+
+    .card {
+        padding: 25px;
+        margin: 40px 0px;
+        border-radius: 10px;
     }
 </style>
 
@@ -21,7 +23,7 @@
                     <h4 class="my-2">Add New Section</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/Users/SaveSection" enctype="multipart/form-data">
+                    <form method="post" action="/Section/SaveSectionInfo">
                         <div class="mb-3">
                             <label>Section Name:</label>
                             <input class="form-control" type="text" name="SectionName" required />
@@ -43,33 +45,42 @@
 </div>
 
 
-<table class="table table-info">
-    <thead class="thead-dark">
-        <tr>
-            <th scope="col">Section ID</th>
-            <th scope="col">Section Name</th>
-            <th scope="col">Course</th>
-            <th scope="col">Year Level</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>Otto</td>
-            <td>Otto</td>
-        </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Otto</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>Otto</td>
-        </tr>
-    </tbody>
-</table> 
+<div class="container my-3">
+    <div class="table-responsive">
+        <table class="table table-info p-3 table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Section ID</th>
+                    <th scope="col">Section Name</th>
+                    <th scope="col">Course</th>
+                    <th scope="col">Year Level</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sections in Model.SectionsList)
+                {
+                    <tr>
+                        <td>@sections.SectionID</td>
+                        <td>@sections.SectionName</td>
+                        <td>@sections.Course</td>
+                        <td>@sections.YearLevel</td>
+                        <td>
+                            <input type="hidden" name="sectionId" value="@sections.SectionID" />
+                            <a class="btn btn-outline-warning" href="/Section/EditSectionInfo?sectionId=@sections.SectionID">
+                                <i class="fa fa-pen"></i>
+                            </a>
+                            <a class="btn btn-outline-danger"
+                                href="/Section/DeleteSectionInfo?sectionId=@sections.SectionID">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
 <script>

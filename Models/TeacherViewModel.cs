@@ -9,5 +9,6 @@ namespace PrefinalWebApplication1.Models
         public string? Department { get; set; }
         public string? EmailAddress { get; set; }
         public string? ContactNumber { get; set; }
+        public List<TeacherViewModel> TeachersList { get; set; } = new List<TeacherViewModel>();
     }
 }

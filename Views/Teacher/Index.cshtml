@@ -1,12 +1,12 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
-<style>
+﻿<style>
     #teacherFormContainer {
         display: none;
+    }
+
+    .card {
+        padding: 25px;
+        margin: 40px 0px;
+        border-radius: 10px;
     }
 </style>
 
@@ -17,13 +17,13 @@
 
 <div id="teacherFormContainer" class="container my-3">
     <div class="row justify-content-center">
-        <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="col-sm-6 col-md-6 col-lg-12">
             <div class="rounded-3 card">
                 <div class="card-header text-center">
                     <h4 class="my-2">Add New Teacher</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/Users/SaveTeacher" enctype="multipart/form-data">
+                    <form method="post" action="/Teacher/SaveTeacherInfo">
                         <div class="mb-3">
                             <label>First Name:</label>
                             <input class="form-control" type="text" name="FirstName" required />
@@ -42,13 +42,13 @@
                         </div>
                         <div class="mb-3">
                             <label>Email Address:</label>
-                            <input class="form-control" type="email" name="Email" required />
+                            <input class="form-control" type="email" name="EmailAddress" required />
                         </div>
                         <div class="mb-3">
                             <label>Contact Number:</label>
                             <input class="form-control" type="text" name="ContactNumber" required />
                         </div>
-                        <button type="submit" class="btn btn-success my-3 w-100">Save</button>
+                        <button type="submit" class="btn btn-primary my-3 w-100">Save</button>
                     </form>
                 </div>
             </div>
@@ -59,7 +59,7 @@
 
 <div class="container my-3">
     <div class="table-responsive">
-        <table class="table table-info">
+        <table class="table table-info p-3 table-striped table-hover">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Teacher ID</th>
@@ -73,26 +73,28 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Otto</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Mark</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>Mark</td>
-                </tr>
+                @foreach (var teacher in Model.TeachersList)
+                {
+                    <tr>
+                        <td scope="row">@teacher.TeacherID</td>
+                        <td>@teacher.FirstName</td>
+                        <td>@teacher.MiddleName</td>
+                        <td>@teacher.LastName</td>
+                        <td>@teacher.Department</td>
+                        <td>@teacher.EmailAddress</td>
+                        <td>@teacher.ContactNumber</td>
+                        <td>
+                            <input type="hidden" name="teacherID" value="@teacher.TeacherID" />
+                            <a class="btn btn-outline-warning" href="/Teacher/EditTeacherInfo?teacherId=@teacher.TeacherID">
+                                <i class="fa fa-pen"></i>
+                            </a>
+                            <a class="btn btn-outline-danger"
+                                href="/Teacher/DeleteTeacherInfo?teacherID=@teacher.TeacherID">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

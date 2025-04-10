@@ -1,12 +1,12 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
-<style>
+﻿<style>
     #roomFormContainer {
         display: none;
+    }
+
+    .card {
+        padding: 25px;
+        margin: 40px 0px;
+        border-radius: 10px;
     }
 </style>
 
@@ -23,7 +23,7 @@
                     <h4 class="my-2">Add New Room</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/Users/SaveRoom" enctype="multipart/form-data">
+                    <form method="post" action="/Room/SaveRoomInfo">
                         <div class="mb-3">
                             <label>Room Name:</label>
                             <input class="form-control" type="text" name="RoomName" required />
@@ -44,33 +44,44 @@
     </div>
 </div>
 
-<table class="table table-info">
-    <thead class="thead-dark">
-        <tr>
-            <th scope="col">Room ID</th>
-            <th scope="col">Room Name</th>
-            <th scope="col">Floor</th>
-            <th scope="col">Building</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>Otto</td>
-            <td>Mark</td>
-        </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Otto</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>Otto</td>
-        </tr>
-    </tbody>
-</table>
+
+<div class="container my-3">
+    <div class="table-responsive">
+        <table class="table table-info p-3 table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Room ID</th>
+                    <th scope="col">Room Name</th>
+                    <th scope="col">Floor</th>
+                    <th scope="col">Building</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var room in Model.RoomsList)
+                {
+                    <tr>
+                        <td>@room.RoomID</td>
+                        <td>@room.RoomName</td>
+                        <td>@room.Floor</td>
+                        <td>@room.Building</td>
+                        <td>
+                            <input type="hidden" name="roomId" value="@room.RoomID" />
+                            <a class="btn btn-outline-warning"
+                                href="/Room/EditRoomInfo?roomId=@room.RoomID">
+                                <i class="fa fa-pen"></i>
+                            </a>
+                            <a class="btn btn-outline-danger"
+                                href="/Room/DeleteRoomInfo?roomId=@room.RoomID">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
 <script>

@@ -1,83 +1,142 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PrefinalWebApplication1.Models;
 
 namespace PrefinalWebApplication1.Controllers
 {
     public class RoomController : Controller
     {
-        // GET: RoomController
-        public ActionResult Index()
+        private static List<RoomViewModel> roomsList = new List<RoomViewModel>();
+        private const string roomInfoFolderPath = "PrototypeDB/RoomInfoFolder";
+
+        public RoomController()
         {
-            return View();
+            if (!Directory.Exists(roomInfoFolderPath))
+            {
+                Directory.CreateDirectory(roomInfoFolderPath);
+            }
+
+            LoadRoomInfo();
         }
 
-        // GET: RoomController/Details/5
-        public ActionResult Details(int id)
+        public IActionResult Index()
         {
-            return View();
+            var model = new RoomViewModel
+            {
+                RoomsList = roomsList.OrderBy(sec => sec.RoomID).ToList()
+            };
+
+            return View(model);
         }
 
-        // GET: RoomController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: RoomController/Create
+        //save user
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult SaveRoomInfo(RoomViewModel updatedRoom)
         {
-            try
+            if (updatedRoom == null)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
-            catch
+
+            var existingSection = roomsList.FirstOrDefault(rm => rm.RoomID == updatedRoom.RoomID);
+
+            if (existingSection != null)
             {
-                return View();
+                existingSection.RoomName = updatedRoom.RoomName;
+                existingSection.Floor = updatedRoom.Floor;
+                existingSection.Building = updatedRoom.Building;
             }
+            else
+            {
+                updatedRoom.RoomID = roomsList.Count + 1;
+                roomsList.Add(updatedRoom);
+            }
+
+            string filePath = Path.Combine(roomInfoFolderPath, $"{updatedRoom.RoomID}.txt");
+            string roomData = $"{updatedRoom.RoomID},{updatedRoom.RoomName},{updatedRoom.Floor},{updatedRoom.Building}";
+            System.IO.File.WriteAllText(filePath, roomData);
+
+            return RedirectToAction("Index");
         }
 
-        // GET: RoomController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public IActionResult DeleteRoomInfo(int roomID)
         {
-            return View();
+            var user = roomsList.FirstOrDefault(usr => usr.RoomID == roomID);
+            if (user != null)
+            {
+                roomsList.Remove(user);
+                string filePath = Path.Combine(roomInfoFolderPath, $"{roomID}.txt");
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            return RedirectToAction("Index");
         }
 
-        // POST: RoomController/Edit/5
+        [HttpGet]
+        public IActionResult EditRoomInfo(int roomID)
+        {
+            LoadRoomInfo();
+
+            string filePath = Path.Combine(roomInfoFolderPath, $"{roomID}.txt");
+
+            if (System.IO.File.Exists(filePath))
+            {
+                string[] roomData = System.IO.File.ReadAllText(filePath).Split(',');
+
+                if (roomData.Length >= 4)
+                {
+                    var room = new RoomViewModel
+                    {
+                        RoomID = int.Parse(roomData[0]),
+                        RoomName = roomData[1],
+                        Floor = int.Parse(roomData[2]),
+                        Building = roomData[3],
+                    };
+
+                    return View("EditRoom", room);
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        // Update user details from editing
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult UpdateRoomInfo(RoomViewModel updatedRoom)
         {
-            try
+            string filePath = Path.Combine(roomInfoFolderPath, $"{updatedRoom.RoomID}.txt");
+
+            if (System.IO.File.Exists(filePath))
             {
-                return RedirectToAction(nameof(Index));
+                string roomData = $"{updatedRoom.RoomID},{updatedRoom.RoomName},{updatedRoom.Floor},{updatedRoom.Building}";
+                System.IO.File.WriteAllText(filePath, roomData);
             }
-            catch
-            {
-                return View();
-            }
+
+            return RedirectToAction("Index");
         }
 
-        // GET: RoomController/Delete/5
-        public ActionResult Delete(int id)
+        // Load users for viewing
+        private void LoadRoomInfo()
         {
-            return View();
-        }
-
-        // POST: RoomController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            roomsList.Clear();
+            foreach (var file in Directory.GetFiles(roomInfoFolderPath, "*.txt"))
             {
-                return RedirectToAction(nameof(Index));
+                string[] roomData = System.IO.File.ReadAllText(file).Split(',');
+                if (roomData.Length >= 4)
+                {
+                    roomsList.Add(new RoomViewModel
+                    {
+                        RoomID = int.Parse(roomData[0]),
+                        RoomName = roomData[1],
+                        Floor = int.Parse(roomData[2]),
+                        Building = roomData[3],
+                    });
+                }
             }
-            catch
-            {
-                return View();
-            }
+            roomsList = roomsList.OrderBy(sec => sec.RoomID).ToList();
         }
     }
 }

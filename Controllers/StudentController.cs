@@ -15,7 +15,7 @@ namespace PrefinalWebApplication1.Controllers
                 Directory.CreateDirectory(studentInfoFolderPath);
             }
 
-            LoadStudents();
+            LoadStudentsInfo();
         }
 
         public IActionResult Index()
@@ -41,7 +41,6 @@ namespace PrefinalWebApplication1.Controllers
 
             if (existingStudent != null)
             {
-                // Update existing user
                 existingStudent.FirstName = newStudent.FirstName;
                 existingStudent.MiddleName = newStudent.MiddleName;
                 existingStudent.LastName = newStudent.LastName;
@@ -52,7 +51,6 @@ namespace PrefinalWebApplication1.Controllers
             }
             else
             {
-                // Create new user
                 newStudent.StudentID = studentsList.Count + 1;
                 studentsList.Add(newStudent);
             }
@@ -84,7 +82,7 @@ namespace PrefinalWebApplication1.Controllers
         [HttpGet]
         public IActionResult EditStudentInfo(int studentID)
         {
-            LoadStudents();
+            LoadStudentsInfo();
 
             string filePath = Path.Combine(studentInfoFolderPath, $"{studentID}.txt");
 
@@ -115,7 +113,7 @@ namespace PrefinalWebApplication1.Controllers
 
         // Update user details from editing
         [HttpPost]
-        public IActionResult UpdateStudent(StudentViewModel updatedStudent)
+        public IActionResult UpdateStudentInfo(StudentViewModel updatedStudent)
         {
             string filePath = Path.Combine(studentInfoFolderPath, $"{updatedStudent.StudentID}.txt");
 
@@ -129,7 +127,7 @@ namespace PrefinalWebApplication1.Controllers
         }
 
         // Load users for viewing
-        private void LoadStudents()
+        private void LoadStudentsInfo()
         {
             studentsList.Clear();
             foreach (var file in Directory.GetFiles(studentInfoFolderPath, "*.txt"))

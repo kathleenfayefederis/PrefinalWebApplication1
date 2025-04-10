@@ -6,5 +6,7 @@ namespace PrefinalWebApplication1.Models
         public string? RoomName { get; set; }
         public int Floor { get; set; }
         public string? Building { get; set; }
+
+        public List<RoomViewModel> RoomsList { get; set; } = new List<RoomViewModel>();
     }
 }

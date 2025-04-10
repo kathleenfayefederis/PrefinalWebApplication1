@@ -1,12 +1,12 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
-<style>
+﻿<style>
     #studentFormContainer {
         display: none;
+    }
+
+    .card {
+        padding: 25px;
+        margin: 40px 0px;
+        border-radius: 10px;
     }
 </style>
 
@@ -22,9 +22,8 @@
                 <div class="card-header text-center">
                     <h4 class="my-2">Add New Student</h4>
                 </div>
-
                 <div class="card-body">
-                    <form method="post" action="/Student/SaveStudentInfo" enctype="multipart/form-data">
+                    <form method="post" action="/Student/SaveStudentInfo">
                         <div class="mb-3">
                             <label>First Name:</label>
                             <input class="form-control" type="text" name="FirstName" required />
@@ -63,7 +62,7 @@
 
 <div class="container my-3">
     <div class="table-responsive">
-        <table class="table table-info">
+        <table class="table table-success table-striped table-hover">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Student ID</th>
@@ -94,7 +93,8 @@
                             <a class="btn btn-outline-warning" href="/Student/EditStudentInfo?studentId=@student.StudentID">
                                 <i class="fa fa-pen"></i>
                             </a>
-                            <a class="btn btn-outline-danger" href="/Student/DeleteStudentInfo?studentID=@student.StudentID">
+                            <a class="btn btn-outline-danger"
+                                href="/Student/DeleteStudentInfo?studentID=@student.StudentID">
                                 <i class="fa fa-trash"></i>
                             </a>
                         </td>

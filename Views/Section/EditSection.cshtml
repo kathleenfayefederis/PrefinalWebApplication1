@@ -1,0 +1,36 @@
+@model SectionViewModel
+
+<h2 class="display-4" style="text-align: center">Edit Section Information</h2>
+
+<div id="studentFormContainer" class="container my-3">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+      <div class="rounded-3 card">
+        <div class="card-header text-center">
+          <h4 class="my-2">Edit Section</h4>
+        </div>
+
+        <div class="card-body">
+          <form method="post" action="/Section/UpdateSectionInfo">
+            <div class="mb-3">
+              <input type="hidden" name="SectionID" value="@Model.SectionID" />
+            </div>
+            <div class="mb-3">
+              <label>Section Name:</label>
+              <input class="form-control" value="@Model.SectionName" type="text" name="SectionName" required />
+            </div>
+            <div class="mb-3">
+              <label>Course:</label>
+              <input class="form-control" value="@Model.Course" type="text" name="Course" required />
+            </div>
+            <div class="mb-3">
+              <label>Year Level:</label>
+              <input class="form-control" value="@Model.YearLevel" type="number" name="YearLevel" required />
+            </div>
+            <button type="submit" class="btn btn-success my-3 w-100">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

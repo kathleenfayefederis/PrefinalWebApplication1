@@ -22,7 +22,7 @@
                     <h4 class="my-2">Add New Course</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/Users/SaveCourse" enctype="multipart/form-data">
+                    <form method="post" action="/Course/SaveCourseInfo">
                         <div class="mb-3">
                             <label>Course Name:</label>
                             <input class="form-control" type="text" name="CourseName" required />
@@ -54,13 +54,24 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Otto</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>Mark</td>
-        </tr>
+        @foreach (var course in Model.CoursesList)
+        {
+            <tr>
+                <td>@course.CourseID</td>
+                <td>@course.CourseName</td>
+                <td>@course.CourseDuration</td>
+                <td>@course.CourseDepartment</td>
+                <td>
+                    <input type="hidden" name="courseId" value="@course.CourseID" />
+                    <a class="btn btn-outline-warning" href="/Course/EditCourseInfo?courseId=@course.CourseID">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                    <a class="btn btn-outline-danger" href="/Course/DeleteCourseInfo?courseId=@course.CourseID">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 

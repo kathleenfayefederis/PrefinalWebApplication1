@@ -1,83 +1,142 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PrefinalWebApplication1.Models;
 
 namespace PrefinalWebApplication1.Controllers
 {
     public class SectionController : Controller
     {
-        // GET: SectionController
-        public ActionResult Index()
+        private static List<SectionViewModel> sectionsList = new List<SectionViewModel>();
+        private const string sectionInfoFolderPath = "PrototypeDB/SectionInfoFolder";
+
+        public SectionController()
         {
-            return View();
+            if (!Directory.Exists(sectionInfoFolderPath))
+            {
+                Directory.CreateDirectory(sectionInfoFolderPath);
+            }
+
+            LoadSectionInfo();
         }
 
-        // GET: SectionController/Details/5
-        public ActionResult Details(int id)
+        public IActionResult Index()
         {
-            return View();
+            var model = new SectionViewModel
+            {
+                SectionsList = sectionsList.OrderBy(sec => sec.SectionID).ToList()
+            };
+
+            return View(model);
         }
 
-        // GET: SectionController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: SectionController/Create
+        //save user
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult SaveSectionInfo(SectionViewModel newSection)
         {
-            try
+            if (newSection == null)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
-            catch
+
+            var existingSection = sectionsList.FirstOrDefault(sec => sec.SectionID == newSection.SectionID);
+
+            if (existingSection != null)
             {
-                return View();
+                existingSection.SectionName = newSection.SectionName;
+                existingSection.Course = newSection.Course;
+                existingSection.YearLevel = newSection.YearLevel;
             }
+            else
+            {
+                newSection.SectionID = sectionsList.Count + 1;
+                sectionsList.Add(newSection);
+            }
+
+            string filePath = Path.Combine(sectionInfoFolderPath, $"{newSection.SectionID}.txt");
+            string sectionData = $"{newSection.SectionID},{newSection.SectionName},{newSection.Course},{newSection.YearLevel}";
+            System.IO.File.WriteAllText(filePath, sectionData);
+
+            return RedirectToAction("Index");
         }
 
-        // GET: SectionController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public IActionResult DeleteSectionInfo(int sectionID)
         {
-            return View();
+            var user = sectionsList.FirstOrDefault(usr => usr.SectionID == sectionID);
+            if (user != null)
+            {
+                sectionsList.Remove(user);
+                string filePath = Path.Combine(sectionInfoFolderPath, $"{sectionID}.txt");
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            return RedirectToAction("Index");
         }
 
-        // POST: SectionController/Edit/5
+        [HttpGet]
+        public IActionResult EditSectionInfo(int sectionID)
+        {
+            LoadSectionInfo();
+
+            string filePath = Path.Combine(sectionInfoFolderPath, $"{sectionID}.txt");
+
+            if (System.IO.File.Exists(filePath))
+            {
+                string[] sectionData = System.IO.File.ReadAllText(filePath).Split(',');
+
+                if (sectionData.Length >= 4)
+                {
+                    var section = new SectionViewModel
+                    {
+                        SectionID = int.Parse(sectionData[0]),
+                        SectionName = sectionData[1],
+                        Course = sectionData[2],
+                        YearLevel = sectionData[3],
+                    };
+
+                    return View("EditSection", section);
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        // Update user details from editing
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult UpdateSectionInfo(SectionViewModel updatedSection)
         {
-            try
+            string filePath = Path.Combine(sectionInfoFolderPath, $"{updatedSection.SectionID}.txt");
+
+            if (System.IO.File.Exists(filePath))
             {
-                return RedirectToAction(nameof(Index));
+                string sectionData = $"{updatedSection.SectionID},{updatedSection.SectionName},{updatedSection.Course},{updatedSection.YearLevel}";
+                System.IO.File.WriteAllText(filePath, sectionData);
             }
-            catch
-            {
-                return View();
-            }
+
+            return RedirectToAction("Index");
         }
 
-        // GET: SectionController/Delete/5
-        public ActionResult Delete(int id)
+        // Load users for viewing
+        private void LoadSectionInfo()
         {
-            return View();
-        }
-
-        // POST: SectionController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            sectionsList.Clear();
+            foreach (var file in Directory.GetFiles(sectionInfoFolderPath, "*.txt"))
             {
-                return RedirectToAction(nameof(Index));
+                string[] sectionData = System.IO.File.ReadAllText(file).Split(',');
+                if (sectionData.Length >= 4)
+                {
+                    sectionsList.Add(new SectionViewModel
+                    {
+                       SectionID = int.Parse(sectionData[0]),
+                        SectionName = sectionData[1],
+                        Course = sectionData[2],
+                        YearLevel = sectionData[3],
+                    });
+                }
             }
-            catch
-            {
-                return View();
-            }
+            sectionsList = sectionsList.OrderBy(sec => sec.SectionID).ToList();
         }
     }
 }
