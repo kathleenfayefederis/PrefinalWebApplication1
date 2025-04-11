@@ -1,4 +1,5 @@
-﻿<style>
+﻿@model StudentViewModel
+<style>
     #studentFormContainer {
         display: none;
     }
@@ -9,6 +10,54 @@
         border-radius: 10px;
     }
 </style>
+
+<div class="container my-3">
+    <div class="table-responsive">
+        <table class="table table-success table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Student ID</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Middle Name</th>
+                    <th scope="col">Course</th>
+                    <th scope="col">Section</th>
+                    <th scope="col">Email Address</th>
+                    <th scope="col">Contact Number</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model.StudentsList)
+                {
+                    <tr>
+                        <td scope="row">@student.StudentID</td>
+                        <td>@student.FirstName</td>
+                        <td>@student.MiddleName</td>
+                        <td>@student.LastName</td>
+                        <td>@student.Course</td>
+                        <td>@student.Section</td>
+                        <td>@student.EmailAddress</td>
+                        <td>@student.ContactNumber</td>
+                        <td>
+                            <input type="hidden" name="studentId" value="@student.StudentID" />
+                            <a class="btn btn-outline-warning" href="/Student/EditStudentInfo?studentId=@student.StudentID">
+                                <i class="fa fa-pen"></i>
+                            </a>
+                            <a class="btn btn-outline-danger"
+                               href="/Student/DeleteStudentInfo?studentID=@student.StudentID">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
 
 <div class="d-flex justify-content-between text-center">
     <h1>Students</h1>
@@ -60,50 +109,6 @@
     </div>
 </div>
 
-<div class="container my-3">
-    <div class="table-responsive">
-        <table class="table table-success table-striped table-hover">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Student ID</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Middle Name</th>
-                    <th scope="col">Course</th>
-                    <th scope="col">Section</th>
-                    <th scope="col">Email Address</th>
-                    <th scope="col">Contact Number</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var student in Model.StudentsList)
-                {
-                    <tr>
-                        <td scope="row">@student.StudentID</td>
-                        <td>@student.FirstName</td>
-                        <td>@student.MiddleName</td>
-                        <td>@student.LastName</td>
-                        <td>@student.Course</td>
-                        <td>@student.Section</td>
-                        <td>@student.EmailAddress</td>
-                        <td>@student.ContactNumber</td>
-                        <td>
-                            <input type="hidden" name="studentId" value="@student.StudentID" />
-                            <a class="btn btn-outline-warning" href="/Student/EditStudentInfo?studentId=@student.StudentID">
-                                <i class="fa fa-pen"></i>
-                            </a>
-                            <a class="btn btn-outline-danger"
-                                href="/Student/DeleteStudentInfo?studentID=@student.StudentID">
-                                <i class="fa fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
 
 <script>
     function toggleForm() {

@@ -20,11 +20,12 @@ namespace PrefinalWebApplication1.Controllers
 
         public IActionResult Index()
         {
-            var model = new StudentViewModel
+            var model = new StudentViewModel();
+            using (var db = new StudInfoSysContext())
             {
-                StudentsList = studentsList.OrderBy(stud => stud.StudentID).ToList()
-            };
+                model.StudentsList = db.Students.ToList();
 
+            }
             return View(model);
         }
 
