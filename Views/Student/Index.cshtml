@@ -1,4 +1,5 @@
-﻿@model StudentViewModel
+﻿@model List<StudentViewModel>
+
 <style>
     #studentFormContainer {
         display: none;
@@ -28,7 +29,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var student in Model.StudentsList)
+                @foreach (var student in Model)
                 {
                     <tr>
                         <td scope="row">@student.StudentID</td>
@@ -57,8 +58,6 @@
 </div>
 
 
-
-
 <div class="d-flex justify-content-between text-center">
     <h1>Students</h1>
     <button class="btn btn-primary" onClick="toggleForm()"><i class="fa fa-user-plus"></i></button>
@@ -72,7 +71,7 @@
                     <h4 class="my-2">Add New Student</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/Student/SaveStudentInfo">
+					<form method="post" asp-controller="Student" asp-action="AddStudentInfo">
                         <div class="mb-3">
                             <label>First Name:</label>
                             <input class="form-control" type="text" name="FirstName" required />

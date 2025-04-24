@@ -1,4 +1,6 @@
-﻿<style>
+﻿@model List<TeacherViewModel>
+
+<style>
     #teacherFormContainer {
         display: none;
     }
@@ -23,7 +25,7 @@
                     <h4 class="my-2">Add New Teacher</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/Teacher/SaveTeacherInfo">
+					<form method="post" asp-controller="Teacher" asp-action="AddTeacher">
                         <div class="mb-3">
                             <label>First Name:</label>
                             <input class="form-control" type="text" name="FirstName" required />
@@ -56,7 +58,6 @@
     </div>
 </div>
 
-
 <div class="container my-3">
     <div class="table-responsive">
         <table class="table table-info p-3 table-striped table-hover">
@@ -73,7 +74,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var teacher in Model.TeachersList)
+                @foreach (var teacher in Model)
                 {
                     <tr>
                         <td scope="row">@teacher.TeacherID</td>

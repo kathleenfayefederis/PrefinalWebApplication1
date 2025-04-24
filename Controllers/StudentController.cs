@@ -1,156 +1,148 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PrefinalWebApplication1.Models;
+using System.Diagnostics;
+using System.Net.Mail;
 
 namespace PrefinalWebApplication1.Controllers
 {
     public class StudentController : Controller
     {
         private static List<StudentViewModel> studentsList = new List<StudentViewModel>();
-        private const string studentInfoFolderPath = "PrototypeDB/StudentInfoFolder";
 
-        public StudentController()
-        {
-            if (!Directory.Exists(studentInfoFolderPath))
-            {
-                Directory.CreateDirectory(studentInfoFolderPath);
-            }
+		public IActionResult Index()
+		{
+			StudentViewModel model = new StudentViewModel();
+			using (var db = new StudInfoSysContext())
+			{
+				model.StudentsList = db.Students.ToList();
 
-            LoadStudentsInfo();
-        }
+			}
+			return View(model);
+			//return View(studentsList);
+		}
 
-        public IActionResult Index()
-        {
-            var model = new StudentViewModel();
+		[HttpPost]
+		public IActionResult AddStudentInfo(StudentViewModel studentViewModel)
+		{
+
+			StudentViewModel resp = new StudentViewModel();
+			if (ModelState.IsValid)
+			{
+				using (var db = new StudInfoSysContext())
+				{
+					studentsList.Add(studentViewModel);
+					ModelState.Clear();
+					{
+						var newStudent = new Student
+						{
+							LastName = studentViewModel.LastName,
+							FirstName = studentViewModel.FirstName,
+							MiddleName = studentViewModel.MiddleName,
+							Course = studentViewModel.Course,
+							Section = studentViewModel.Section,
+							EmailAddress = studentViewModel.EmailAddress,
+							ContactNumber = studentViewModel.ContactNumber,
+						};
+
+						db.Students.Add(newStudent);
+						db.SaveChanges();
+					}
+				}
+			}
             using (var db = new StudInfoSysContext())
             {
-                model.StudentsList = db.Students.ToList();
-
+				resp.StudentsList = db.Students.ToList();
             }
-            return View(model);
+
+			return View("Index", resp);
         }
 
-        //save user
-        [HttpPost]
-        public IActionResult SaveStudentInfo(StudentViewModel newStudent)
-        {
-            if (newStudent == null)
-            {
-                return RedirectToAction("Index");
-            }
+		
+[HttpPost]
+	public IActionResult EditAccount(StudentViewEditModel studentViewEditModel)
+	{
+		if (ModelState.IsValid)
+			{
+			using (var db = new StudInfoSysContext())
+			{
+				Student userToEdit = db.Students.Find(studentViewEditModel.StudentID);
 
-            var existingStudent = studentsList.FirstOrDefault(stud => stud.StudentID == newStudent.StudentID);
+				if (userToEdit != null)
+				{
+					userToEdit.LastName = studentViewEditModel.LastName;
+					userToEdit.FirstName = studentViewEditModel.FirstName;
+					userToEdit.MiddleName = studentViewEditModel.MiddleName;
+					userToEdit.Course = studentViewEditModel.Course;
+					userToEdit.Section = studentViewEditModel.Section;
+					userToEdit.EmailAddress = studentViewEditModel.EmailAddress;
+					userToEdit.ContactNumber = studentViewEditModel.ContactNumber;
 
-            if (existingStudent != null)
-            {
-                existingStudent.FirstName = newStudent.FirstName;
-                existingStudent.MiddleName = newStudent.MiddleName;
-                existingStudent.LastName = newStudent.LastName;
-                existingStudent.Course = newStudent.Course;
-                existingStudent.Section = newStudent.Section;
-                existingStudent.EmailAddress = newStudent.EmailAddress;
-                existingStudent.ContactNumber = newStudent.ContactNumber;
-            }
-            else
-            {
-                newStudent.StudentID = studentsList.Count + 1;
-                studentsList.Add(newStudent);
-            }
+					db.SaveChanges();
+				}
+			}
+			}
 
-            string filePath = Path.Combine(studentInfoFolderPath, $"{newStudent.StudentID}.txt");
-            string studentData = $"{newStudent.StudentID},{newStudent.FirstName},{newStudent.MiddleName},{newStudent.LastName},{newStudent.Course},{newStudent.Section},{newStudent.EmailAddress},{newStudent.ContactNumber}";
-            System.IO.File.WriteAllText(filePath, studentData);
+			StudentViewModel resp = new StudentViewModel();
+			using (var db = new StudInfoSysContext())
+			{
+				resp.StudentsList = db.Students.ToList();
+			}
 
-            return RedirectToAction("Index");
-        }
+		return View("Index", resp);
+	}
 
-        [HttpGet]
-        public IActionResult DeleteStudentInfo(int studentID)
-        {
-            var user = studentsList.FirstOrDefault(usr => usr.StudentID == studentID);
-            if (user != null)
-            {
-                studentsList.Remove(user);
-                string filePath = Path.Combine(studentInfoFolderPath, $"{studentID}.txt");
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-            }
+		public IActionResult DeleteStudentInfo(StudentViewDeleteModel studentViewDeleteModel)
+		{
+			if (ModelState.IsValid)
+			{
+				using (var db = new StudInfoSysContext())
+				{
+					Student userToDelete = db.Students.Find(studentViewDeleteModel.StudentID);
+					if (userToDelete != null)
+					{
+						userToDelete.IsDeleted = 1;
+						db.SaveChanges();
+					}
+				}
+			}
 
-            return RedirectToAction("Index");
-        }
+			StudentViewDeleteModel resp = new StudentViewDeleteModel();
+			using (var db = new StudInfoSysContext())
+			{
+				resp.StudentsList = db.Students.ToList();
+			}
+			return View("Student", resp);
 
-        [HttpGet]
-        public IActionResult EditStudentInfo(int studentID)
-        {
-            LoadStudentsInfo();
+		}
 
-            string filePath = Path.Combine(studentInfoFolderPath, $"{studentID}.txt");
 
-            if (System.IO.File.Exists(filePath))
-            {
-                string[] studentData = System.IO.File.ReadAllText(filePath).Split(',');
+		//[HttpPost]
+		//public IActionResult SaveStudentInfo(StudentViewModel newStudent)
+		//{
 
-                if (studentData.Length >= 8)
-                {
-                    var student = new StudentViewModel
-                    {
-                        StudentID = int.Parse(studentData[0]),
-                        FirstName = studentData[1],
-                        MiddleName = studentData[2],
-                        LastName = studentData[3],
-                        Course = studentData[4],
-                        Section = studentData[5],
-                        EmailAddress = studentData[6],
-                        ContactNumber = studentData[7],
-                    };
+		//}
 
-                    return View("EditStudent", student);
-                }
-            }
+		//[HttpGet]
+		//public IActionResult DeleteStudentInfo(int studentID)
+		//{
 
-            return RedirectToAction("Index");
-        }
+		//}
 
-        // Update user details from editing
-        [HttpPost]
-        public IActionResult UpdateStudentInfo(StudentViewModel updatedStudent)
-        {
-            string filePath = Path.Combine(studentInfoFolderPath, $"{updatedStudent.StudentID}.txt");
+		//[HttpGet]
+		//public IActionResult EditStudentInfo(int studentID)
+		//{
 
-            if (System.IO.File.Exists(filePath))
-            {
-                string studentData = $"{updatedStudent.StudentID},{updatedStudent.FirstName},{updatedStudent.MiddleName},{updatedStudent.LastName},{updatedStudent.Course},{updatedStudent.Section},{updatedStudent.EmailAddress},{updatedStudent.ContactNumber}";
-                System.IO.File.WriteAllText(filePath, studentData);
-            }
+		//}
 
-            return RedirectToAction("Index");
-        }
+		//[HttpPost]
+		//public IActionResult UpdateStudentInfo(StudentViewModel updatedStudent)
+		//{
 
-        // Load users for viewing
-        private void LoadStudentsInfo()
-        {
-            studentsList.Clear();
-            foreach (var file in Directory.GetFiles(studentInfoFolderPath, "*.txt"))
-            {
-                string[] studentData = System.IO.File.ReadAllText(file).Split(',');
-                if (studentData.Length >= 8)
-                {
-                    studentsList.Add(new StudentViewModel
-                    {
-                        StudentID = int.Parse(studentData[0]),
-                        FirstName = studentData[1],
-                        MiddleName = studentData[2],
-                        LastName = studentData[3],
-                        Course = studentData[4],
-                        Section = studentData[5],
-                        EmailAddress = studentData[6],
-                        ContactNumber = studentData[7],
-                    });
-                }
-            }
-            studentsList = studentsList.OrderBy(stud => stud.StudentID).ToList();
-        }
+		//}
 
-    }
+		//private void LoadStudentsInfo()
+		//{
+
+		//}
+	}
 }

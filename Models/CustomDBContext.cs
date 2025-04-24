@@ -9,9 +9,14 @@ namespace PrefinalWebApplication1.Models
 
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		public object Teacher { get; internal set; }
+
+		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=DESKTOP-792M68U\\SQLEXPRESS;Initial Catalog=StudInfoSys;Integrated Security=True;Trust Server Certificate=True");
+
+			//laptop: DESKTOP-D5DOJRU\SQLEXPRESS
+			//lab computer: DESKTOP-792M68U\\SQLEXPRESS
+			optionsBuilder.UseSqlServer("Data Source=DESKTOP-D5DOJRU\\SQLEXPRESS;Initial Catalog=StudInfoSys;Integrated Security=True;Trust Server Certificate=True");
         }
     }
 }
