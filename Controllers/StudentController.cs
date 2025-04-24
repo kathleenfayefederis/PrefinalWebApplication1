@@ -114,35 +114,5 @@ namespace PrefinalWebApplication1.Controllers
 			return View("Student", resp);
 
 		}
-
-
-		//[HttpPost]
-		//public IActionResult SaveStudentInfo(StudentViewModel newStudent)
-		//{
-
-		//}
-
-		//[HttpGet]
-		//public IActionResult DeleteStudentInfo(int studentID)
-		//{
-
-		//}
-
-		//[HttpGet]
-		//public IActionResult EditStudentInfo(int studentID)
-		//{
-
-		//}
-
-		//[HttpPost]
-		//public IActionResult UpdateStudentInfo(StudentViewModel updatedStudent)
-		//{
-
-		//}
-
-		//private void LoadStudentsInfo()
-		//{
-
-		//}
 	}
 }
